@@ -1,0 +1,251 @@
+===== Query Buat Tabel =====
+CREATE TABLE users (
+	id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    nama VARCHAR(255) NOT NULL,
+    username VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(100) NOT NULL,
+    role VARCHAR(70) DEFAULT 'user' CHECK(role IN ('user','admin')),
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+CREATE TABLE tujuan (
+    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    nama_daerah VARCHAR(100) NOT NULL,
+    jarak_tujuan INT NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+create table tipe_bus (
+	id int not null PRIMARY KEY AUTO_INCREMENT,
+    tipe varchar(255) not null,
+    created_at datetime not null DEFAULT CURRENT_TIMESTAMP,
+    updated_at datetime not null DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+create table kelas (
+	id int not null PRIMARY KEY AUTO_INCREMENT,
+    nama_kelas varchar(255) not null,
+    created_at datetime not null DEFAULT CURRENT_TIMESTAMP,
+    updated_at datetime not null DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+create table bus (
+	id int not null PRIMARY KEY AUTO_INCREMENT,
+    nama_bus varchar(255) not null,
+    id_tipe int not null,
+    jumlah_kursi int not null,
+    harga_per_km int not null,
+  	id_kelas int not null,
+    created_at datetime not null DEFAULT CURRENT_TIMESTAMP,
+    updated_at datetime not null DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_tipe) REFERENCES tipe_bus(id) on DELETE CASCADE,
+    FOREIGN KEY (id_kelas) REFERENCES kelas(id) on DELETE CASCADE
+);
+create table jadwal (
+	id int not null primary key auto_increment,
+    id_tujuan int not null,
+    id_bus int not null,
+    harga int,
+    tanggal_keberangkatan datetime not null,
+    tanggal_sampai datetime not null,
+    status_jadwal varchar(100) default 'dibuka' check (status_jadwal in ('dibuka','ditutup')),
+    created_at datetime not null DEFAULT CURRENT_TIMESTAMP,
+    updated_at datetime not null DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_tujuan) REFERENCES tujuan(id) on DELETE CASCADE,
+    FOREIGN KEY (id_bus) REFERENCES bus(id) on DELETE CASCADE
+);
+create table ticket (
+	id int not null primary key AUTO_INCREMENT,
+    id_user int not null,
+    id_jadwal int not null,
+    nama_penumpang varchar(255) not null,
+    email varchar(255) not null,
+    telepon int not null,
+    status_pembayaran varchar(255) check (status_pembayaran in ('batal','pending','lunas')),
+    created_at datetime not null DEFAULT CURRENT_TIMESTAMP,
+    updated_at datetime not null DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_user) REFERENCES users(id) on DELETE CASCADE,
+    FOREIGN KEY (id_jadwal) REFERENCES jadwal(id) on DELETE CASCADE
+);
+
+
+===== Insert Data Ke Dalam Table =====
+insert into tipe_bus(tipe) VALUES ('Normal Deck'),('High Deck'),('Ultra High Decker'),('Super High Decker'),('High Decker Double Glass');
+
+insert into kelas(nama_kelas) values ('Ekonomi'),('Reguler'),('Express'),('Shuttle'),('Eksklusif');
+
+insert into tujuan(nama_daerah,jarak_tujuan) values ('Solo',142),('Semarang',230),('Jakarta',1200),('Surabaya',720),('Bandung',600);
+
+insert into users(nama,username,password,role) values 
+('Sulthan Asyraf D','asyraffff','asyraf1234','user'),
+('Haikal Raditya Fadhilah','haikkk','haikalfa1234','admin'),
+('Reza Setiawan','rezaaaa','rezaif1234','admin'),
+('Fajar Rizky Yunanto','Fajarrrr','fajar12345','user'),
+('Gilang Ramadhani','gilangg','ramsss1234','user')
+
+insert into bus(nama_bus,id_tipe,jumlah_kursi,harga_per_km,id_kelas) VALUES
+('Maju Jaya',2,24,3000,4),
+('Sinar Jaya',3,30,2500,1),
+('Harapan Jaya',1,30,1500,1),
+('Pahala Kencana',3,50,4000,3),
+('Safari Dharma Raya',5,15,1200,5)
+
+INSERT INTO `jadwal` (`id`, `id_tujuan`, `id_bus`, `harga`, `tanggal_keberangkatan`, `tanggal_sampai`, `status_jadwal`, `created_at`, `updated_at`) VALUES (NULL, '5', '4', '500000', '2023-07-15 15:00:00', '2023-07-21 09:00:00', 'dibuka', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP), (NULL, '2', '5', '350000', '2023-07-08 09:00:00', '2023-07-10 22:00:00', 'dibuka', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP), (NULL, '1', '1', '150000', '2023-07-16 22:48:05', '2023-07-20 08:00:00', 'dibuka', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP), (NULL, '3', '3', '80000', '2023-07-13 12:00:00', '2023-07-14 00:00:00', 'ditutup', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP), (NULL, '3', '2', '760000', '2023-07-25 05:00:00', '2023-07-27 09:00:00', 'dibuka', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+INSERT INTO `ticket` (`id`, `id_user`, `id_jadwal`, `nama_penumpang`, `email`, `telepon`, `status_pembayaran`, `created_at`, `updated_at`) VALUES (NULL, '2', '7', 'Haikal Raditya Fadhilah', 'haikal@gmail.com', '123324', 'pending', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP), (NULL, '1', '8', 'Kavi Raja', 'kavi@gmail.com', '435436546', 'pending', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP), (NULL, '3', '8', 'Novanda renaldy', 'renal@gmail.com', '425456', 'lunas', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP), (NULL, '4', '10', 'Deva Tri Rumanto', 'deva@gmail.com', '455656', 'batal', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP), (NULL, '5', '7', 'Dahniar', 'niar@gmail.com', '454523', 'lunas', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+
+===== JOIN TABLE =====
+select a.id,a.nama_bus,a.jumlah_kursi,a.harga_per_km,b.tipe,c.nama_kelas from bus as a inner join tipe_bus as b on a.id_tipe = b.id inner JOIN kelas as c on a.id_kelas = c.id;
+
+(Dengan Menggunakan Join 3 Table kita dapat melihat data bus berserta keterangan pendukungnya seperti nama tipe bus dan kelas bus nya!)
+
+===== Sub Query =====
+
+select * from bus where jumlah_kursi = (select max(jumlah_kursi) from bus);
+
+(Dengan Menggunakan Sub Query kita dapat melihat sebuah data dengan kondisi dari table lain atau query lain,contohnya perintah di atas untuk melihat data bus yang memiliki kursi terbanyak)
+
+===== Function =====
+
+DELIMITER %%
+CREATE FUNCTION hitungHargaTicket (jarak_tujuan int,harga_per_km int)
+RETURNS bigint
+BEGIN
+	DECLARE total_harga bigint;
+    SET total_harga = jarak_tujuan * harga_per_km;
+    RETURN total_harga;
+END %%
+DELIMITER ; 
+
+(Dengan Menggunakan Sebuah Function kita dapat melakukan operasi perhitungan harga ticket berdasarkan jarak tujuan dan harga per km dari bus)
+
+===== Stored Procedure =====
+
+DELIMITER //
+
+CREATE PROCEDURE display_jadwal()
+BEGIN
+    -- Variabel untuk menyimpan hasil perhitungan
+    DECLARE jadwal_idCur INT;
+    DECLARE id_busCur INT;
+    DECLARE hargaCur INT;
+    DECLARE done int DEFAULT 0;
+    
+    -- Deklarasi Cursor untuk mengambil data produk
+    DECLARE jadwal_cursor CURSOR FOR
+        SELECT id, id_bus, harga
+        FROM jadwal;
+    
+    -- Handle ketika tidak ada data di Cursor
+    DECLARE CONTINUE HANDLER FOR NOT FOUND set done =1;
+
+    -- Buka Cursor
+    OPEN jadwal_cursor;
+
+    -- Loop untuk mengambil dan menampilkan data produk
+    read_loop: LOOP
+        FETCH jadwal_cursor INTO jadwal_idCur, id_busCur, hargaCur;
+        IF done THEN
+            LEAVE read_loop;
+        END IF;
+
+        -- Tampilkan informasi produk
+        SELECT CONCAT('Id Jadwal: ', jadwal_idCur, ', Id Bus: ', id_busCur, ', Harga: ', hargaCur) AS Jadwal_Info;
+    END LOOP;
+
+    -- Tutup Cursor
+    CLOSE jadwal_cursor;
+END;
+//
+
+DELIMITER ;
+
+(prosedur  berfungsi untuk menyimpan data dengan menggunakan variabel cursor yang dimana variabel cursor akan menampung nilai hasil queri yang terdiri lebih dari 1 baris atau record. 
+pada kode diatas prosedur ini menggunakan cursor untuk menampung data dari tabel jadwal pada kolom id_jadwal, id_bus, dan harga. data ini dibaca satu per satu  oleh cursor dengan cara melakukan looping. Kemudian data tersebut disimpan ke variabel jadwal_id INT; , id_busCur INT; , hargaCur INT;. dan langkah terakhir adalah untuk memunculkan data yang telah disimpan makan perlu menjalankan queri “SELECT CONCAT('Id Jadwal: ', jadwal_idCur, ', Id Bus: ', id_busCur, ', Harga: ', hargaCur) AS Jadwal_Info;”.)
+
+===== Trigger =====
+
+-- Membuat Trigger
+
+DELIMITER ^^
+CREATE TRIGGER updateStatus
+AFTER UPDATE on ticket FOR EACH ROW
+BEGIN
+	DECLARE statusJadwal varchar(255);
+    IF new.status_pembayaran = 'lunas' THEN
+    	IF (SELECT COUNT(id) from ticket where id_jadwal = new.id_jadwal) >= (select b.jumlah_kursi from jadwal as a 			inner join bus as b on a.id_bus = b.id where a.id = new.id_jadwal) THEN
+    		SET statusJadwal = 'ditutup';
+    	ELSE
+    		SET statusJadwal = 'dibuka';
+    	END IF;
+    ELSE
+    	SET statusJadwal = 'dibuka';
+    END IF;
+    update jadwal set status_jadwal=statusJadwal where id=new.id_jadwal;
+END ^^
+DELIMITER ;
+
+
+(Dengan Menggunakan Sebuah Trigger Kita Dapat Melakukan Sebuah Otomatisasi yaitu akan secara otomatis mengubah Status Jadwal jika jumlah ticket yang di pesan sudah Penuh Sesuai Jumlah Kursi Bus)
+
+-- Melihat Trigger Yang Tersedia
+
+SHOW TRIGGERS FROM `fp-pbd`
+
+(Perintah Persebut Untuk Melihat Daftar Trigger Yang Tersedia Dalam Database fp-pbd)
+
+--Menghapus Trigger update Status
+
+DROP TRIGGER updateStatus
+
+(Perintah Tersebut Berfungsi Untuk Menghapus Trigger updateStatus)
+
+
+===== INDEX =====
+
+CREATE UNIQUE INDEX idx_user_name ON users(nama DESC);
+
+(Dengan Query Di Atas Kita Dapat membuat Sebuah Index Ke tabel users dengan nama idx_user_name)
+
+SELECT * FROM `users` WHERE nama like '%Asyraf%';
+
+(Dengan Query di atas kita dapat menampilkan data users yang nama nya terkandung kata asyraf,namun saat kita telah menggunakan sebuah index kita dapat Mencari data Tersebut dengan lebih cepat)
+
+===== VIEW =====
+
+CREATE VIEW data_bus AS select a.id,a.nama_bus,a.jumlah_kursi,b.tipe,c.nama_kelas from bus as a inner join tipe_bus as b on a.id_tipe = b.id inner join kelas as c on a.id_kelas = c.id;
+
+(View data_bus dengan kita melakukan join terhadap 3 tabel yaitu tabel bus,kelas,tipe_bus dan mendapatkan beberapa tabel yang kita tampilkan agar kita dapat menggunakan query tersebut secara ringkas kita dapat menyimpan nya kedalam sebuah view,dan untuk pemanggilan kita hanya memanggil nama viewnya pada klausa from)
+
+
+CREATE VIEW data_ticket as select a.nama,b.nama_penumpang,b.status_pembayaran,c.tanggal_keberangkatan,c.tanggal_sampai,c.harga,d.nama_daerah,e.nama_bus from users as a inner join ticket as b on a.id = b.id_user inner join jadwal as c on b.id_jadwal = c.id inner join tujuan as d on c.id_tujuan = d.id inner join bus as e on c.id_bus = e.id where b.status_pembayaran = 'lunas';
+
+(Query tersebut saya memanggil beberapa lalu melakukan join untuk mengambil beberapa data di setiap tabel,view juga dapat melakukan klausa where dimana query diatas melakukan kondisi akan menampilkan data ticket yang status pembayarannya lunas saja.lalu saat pemanggilan view juga dapat di seleksi kondisi lagi!)
+
+SHOW FULL TABLES IN `fp-pbd` WHERE TABLE_TYPE LIKE 'VIEW';
+
+(Perintah di atas merupakan query untuk melihat view yang tersedia di database `fp-pbd` di karenakan view merupakan sebuah virtual tabel maka kita melihat view dengan menggunakan FULL TABLES namun mencari dengan tipe tabel nya bersifat view)
+
+drop view if EXISTS data_bus,data_ticket;
+
+(Perintah di atas berfungsi untuk menghapus 2 view yang tersedia yaitu data_bus dan data_ticket di database `fp-pbd` kita menggunakan klausa IF EXISTS agar sekalian mengecek apakah view tersebut tersedia atau tidak,ka view tersedia maka akan di hapus jika view tidak di termukan query tidak menampilkan error)
+
+===== DATABASE SECURITY =====
+
+
+CREATE USER 'manager_proyek'@'localhost' IDENTIFIED BY 'manager1234';
+
+(Query Di Atas kita membuat sebuah user baru dengan nama manager_proyek dan memberikan password berupa manager1234)
+
+GRANT SELECT,INSERT,UPDATE,DELETE ON `fp-pbd`.* TO 'manager_proyek'@'localhost'
+
+GRANT EXECUTE ON FUNCTION hitungHargaTicket TO 'manager_proyek'@'localhost'
+
+(Dengan query di atas kita memberikan semua akses CRUD ke dalam database `fp–pbd` beserta function yang tersedia di database ini yaitu hitungHargaTicket sehingga user manager_proyek dapat melakukan CRUD Pada database ini serta menggunakan view dan functionnya)
+
+select * from mysql.user
+
+(Query diatas berfungsi untuk menampikan user yang terdaftar pada mysql kita,kita melihat basis data mysql dann tabel user maka akan terlihat semua user yang terdaftar dan hak akses yang di miliki seperti select,insert,update,serta delete)
+
+DROP USER 'manager_proyek'@'localhost';
+
+(Dengan Query di atas kita dapat menhapus sebuah user dalam mysql,contohnya saya menghapus user manager_proyek maka user tersebut akan terhapus dan tidak bisa lagi digunakan,saat kita menghapus sebuah user hak akses user tersebut juga ikut hilang,maka saat kita membuat user baru kita harus mendeklarasikan hak akses ulang.)
